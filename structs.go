@@ -1,5 +1,5 @@
 // Discordgo - Discord bindings for Go
-// Available at https://github.com/bwmarrin/discordgo
+// Available at https://github.com/blackmesadev/discordgo
 
 // Copyright 2015-2016 Bruce Marriner <bruce@sqls.net>.  All rights reserved.
 // Use of this source code is governed by a BSD-style
@@ -23,6 +23,18 @@ import (
 
 	"github.com/gorilla/websocket"
 )
+
+// Context holds a bit of extra data we pass along to route handlers
+// This way processing some of this only nees to happen once.
+type Context struct {
+	Fields          []string
+	Content         string
+	IsDirected      bool
+	IsPrivate       bool
+	HasPrefix       bool
+	HasMention      bool
+	HasMentionFirst bool
+}
 
 // A Session represents a connection to the Discord API.
 type Session struct {
