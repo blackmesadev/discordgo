@@ -750,6 +750,27 @@ func (s *Session) GuildBanDelete(guildID, userID string) (err error) {
 	return
 }
 
+// GuildBanDeleteWithReason removes the given user from the guild bans
+// guildID   : The ID of a Guild.
+// userID    : The ID of a User
+// reason    : The reason for this ban
+func (s *Session) GuildBanDeleteWithReason(guildID, userID string, reason string) (err error) {
+
+	uri := EndpointGuildBan(guildID, userID)
+	queryParams := url.Values{}
+
+	if reason != "" {
+		queryParams.Set("reason", reason)
+	}
+
+	if len(queryParams) > 0 {
+		uri += "?" + queryParams.Encode()
+	}
+
+	_, err = s.RequestWithBucketID("DELETE", uri, nil, EndpointGuildBan(guildID, ""))
+	return
+}
+
 // GuildMembers returns a list of members for a guild.
 //  guildID  : The ID of a Guild.
 //  after    : The id of the member to return members after
