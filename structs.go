@@ -1241,6 +1241,11 @@ type IdentifyProperties struct {
 	ReferringDomain string `json:"$referring_domain"`
 }
 
+type GenericError struct {
+	Message string `json:"message"`
+	Code    int    `json:"code"`
+}
+
 // Constants for the different bit offsets of text channel permissions
 const (
 	// Deprecated: PermissionReadMessages has been replaced with PermissionViewChannel for text and voice channels

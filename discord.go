@@ -22,10 +22,28 @@ import (
 )
 
 // VERSION of DiscordGo, follows Semantic Versioning. (http://semver.org/)
-const VERSION = "0.23.0"
+const VERSION = "0.25.2"
 
 // ErrMFA will be risen by New when the user has 2FA.
 var ErrMFA = errors.New("account has 2FA enabled")
+
+// Discord JSON Error Response codes
+var ErrUnknownAccount = errors.New("unknown account")
+var ErrUnknownApplication = errors.New("unknown application")
+var ErrUnknownChannel = errors.New("unknown channel")
+var ErrUnknownGuild = errors.New("unknown guild")
+var ErrUnknownIntegration = errors.New("unknown integration")
+var ErrUnknownInvite = errors.New("unknown invite")
+var ErrUnknownMember = errors.New("unknown member")
+var ErrUnknownMessage = errors.New("unknown message")
+var ErrUnknownOverwrite = errors.New("unknown overwrite")
+var ErrUnknownProvider = errors.New("unknown provider")
+var ErrUnknownRole = errors.New("unknown role")
+var ErrUnknownToken = errors.New("unknown token")
+var ErrUnknownUser = errors.New("unknown user")
+var ErrUnknownEmoji = errors.New("unknown emoji")
+var ErrUnknownWebhook = errors.New("unknown webhook")
+var ErrUnknownBan = errors.New("unknown ban")
 
 // New creates a new Discord session and will automate some startup
 // tasks if given enough information to do so.  Currently you can pass zero

@@ -168,6 +168,46 @@ func (s *Session) RequestWithLockedBucket(method, urlStr, contentType string, b 
 			err = ErrUnauthorized
 		}
 		fallthrough
+	case http.StatusNotFound:
+		var errorMsg *GenericError
+		err := json.Unmarshal(response, &errorMsg)
+		if err != nil {
+			s.log(LogError, "status not found json error, %s", err)
+		}
+		switch errorMsg.Code {
+		case ErrCodeUnknownAccount:
+			err = ErrUnknownAccount
+		case ErrCodeUnknownApplication:
+			err = ErrUnknownApplication
+		case ErrCodeUnknownChannel:
+			err = ErrUnknownChannel
+		case ErrCodeUnknownGuild:
+			err = ErrUnknownGuild
+		case ErrCodeUnknownIntegration:
+			err = ErrUnknownIntegration
+		case ErrCodeUnknownInvite:
+			err = ErrUnknownInvite
+		case ErrCodeUnknownMember:
+			err = ErrUnknownMember
+		case ErrCodeUnknownMessage:
+			err = ErrUnknownMessage
+		case ErrCodeUnknownOverwrite:
+			err = ErrUnknownOverwrite
+		case ErrCodeUnknownProvider:
+			err = ErrUnknownProvider
+		case ErrCodeUnknownRole:
+			err = ErrUnknownRole
+		case ErrCodeUnknownToken:
+			err = ErrUnknownToken
+		case ErrCodeUnknownUser:
+			err = ErrUnknownUser
+		case ErrCodeUnknownEmoji:
+			err = ErrUnknownEmoji
+		case ErrCodeUnknownWebhook:
+			err = ErrUnknownWebhook
+		case ErrCodeUnknownBan:
+			err = ErrUnknownBan
+		}
 	default: // Error condition
 		err = newRestError(req, resp, response)
 	}
