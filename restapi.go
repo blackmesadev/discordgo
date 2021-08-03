@@ -1600,6 +1600,35 @@ func (s *Session) ChannelMessageAck(channelID, messageID, lastToken string) (st 
 	return
 }
 
+// UserMessageSend sends a message to a user.
+// userID : The ID of a User.
+// content   : The message to send.
+func (s *Session) UserMessageSend(userID string, content string) (*Message, error) {
+	userChannel, err := s.UserChannelCreate(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.ChannelMessageSendComplex(userChannel.ID, &MessageSend{
+		Content: content,
+	})
+}
+
+// ChannelMessageSendEmbed sends a message to the given channel with embedded data.
+// userID : The ID of a User.
+// embed : The embed data to send.
+func (s *Session) UserMessageSendEmbed(userID string, embed *MessageEmbed) (*Message, error) {
+	userChannel, err := s.UserChannelCreate(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.ChannelMessageSendComplex(userChannel.ID, &MessageSend{
+		Embed: embed,
+	})
+
+}
+
 // ChannelMessageSend sends a message to the given channel.
 // channelID : The ID of a Channel.
 // content   : The message to send.
