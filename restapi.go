@@ -990,6 +990,17 @@ func (s *Session) GuildMemberRoleAdd(guildID, userID, roleID string) (err error)
 	return
 }
 
+// GuildMemberRoleBulkAdd adds a slice of roleids to a given member.
+//  guildID   : The ID of a Guild.
+//  userID    : The ID of a User.
+//  roleIDs   : The Slice of roleIDs to be assigned to the user.
+func (s *Session) GuildMemberRoleBulkAdd(guildID, userID string, roleIDs []string) (err error) {
+	for _, roleID := range roleIDs {
+		_, err = s.RequestWithBucketID("PUT", EndpointGuildMemberRole(guildID, userID, roleID), nil, EndpointGuildMemberRole(guildID, "", ""))
+	}
+	return
+}
+
 // GuildMemberRoleRemove removes the specified role to a given member
 //  guildID   : The ID of a Guild.
 //  userID    : The ID of a User.
@@ -998,6 +1009,17 @@ func (s *Session) GuildMemberRoleRemove(guildID, userID, roleID string) (err err
 
 	_, err = s.RequestWithBucketID("DELETE", EndpointGuildMemberRole(guildID, userID, roleID), nil, EndpointGuildMemberRole(guildID, "", ""))
 
+	return
+}
+
+// GuildMemberRoleBulkRemove removes a slice of roleids to a given member.
+//  guildID   : The ID of a Guild.
+//  userID    : The ID of a User.
+//  roleIDs   : The Slice of roleIDs to be removed from the user.
+func (s *Session) GuildMemberRoleBulkRemove(guildID, userID string, roleIDs []string) (err error) {
+	for _, roleID := range roleIDs {
+		_, err = s.RequestWithBucketID("DELETE", EndpointGuildMemberRole(guildID, userID, roleID), nil, EndpointGuildMemberRole(guildID, "", ""))
+	}
 	return
 }
 
