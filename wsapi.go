@@ -691,6 +691,20 @@ func (s *Session) ChannelVoiceJoinManual(gID, cID string, mute, deaf bool) (err 
 	return
 }
 
+// ChannelVoiceLeave stops the active voice session in a guild.
+//
+//    gID     : Guild ID of the voice channel to leave.
+func (s *Session) ChannelVoiceLeave(gID string) (err error) {
+	s.log(LogInformational, "called")
+
+	// Send the request to Discord that we want to leave the voice channel.
+	data := voiceChannelJoinOp{4, voiceChannelJoinData{&gID, nil, false, false}}
+	s.wsMutex.Lock()
+	err = s.wsConn.WriteJSON(data)
+	s.wsMutex.Unlock()
+	return
+}
+
 // onVoiceStateUpdate handles Voice State Update events on the data websocket.
 func (s *Session) onVoiceStateUpdate(st *VoiceStateUpdate) {
 
