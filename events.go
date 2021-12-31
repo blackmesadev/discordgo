@@ -86,6 +86,7 @@ type GuildUpdate struct {
 // GuildDelete is the data for a GuildDelete event.
 type GuildDelete struct {
 	*Guild
+	BeforeDelete *Guild `json:"-"`
 }
 
 // GuildBanAdd is the data for a GuildBanAdd event.
@@ -193,6 +194,7 @@ func (m *MessageDelete) UnmarshalJSON(b []byte) error {
 // MessageReactionAdd is the data for a MessageReactionAdd event.
 type MessageReactionAdd struct {
 	*MessageReaction
+	Member *Member `json:"member,omitempty"`
 }
 
 // MessageReactionRemove is the data for a MessageReactionRemove event.

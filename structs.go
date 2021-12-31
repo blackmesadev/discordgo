@@ -162,7 +162,7 @@ type Integration struct {
 	ExpireGracePeriod int                `json:"expire_grace_period"`
 	User              *User              `json:"user"`
 	Account           IntegrationAccount `json:"account"`
-	SyncedAt          Timestamp          `json:"synced_at"`
+	SyncedAt          time.Time          `json:"synced_at"`
 }
 
 // ExpireBehavior of Integration
@@ -209,7 +209,7 @@ type Invite struct {
 	Channel        *Channel       `json:"channel"`
 	Inviter        *User          `json:"inviter"`
 	Code           string         `json:"code"`
-	CreatedAt      Timestamp      `json:"created_at"`
+	CreatedAt      time.Time      `json:"created_at"`
 	MaxAge         int            `json:"max_age"`
 	Uses           int            `json:"uses"`
 	MaxUses        int            `json:"max_uses"`
@@ -270,8 +270,8 @@ type Channel struct {
 	LastMessageID string `json:"last_message_id"`
 
 	// The timestamp of the last pinned message in the channel.
-	// Empty if the channel has no pinned messages.
-	LastPinTimestamp Timestamp `json:"last_pin_timestamp"`
+	// nil if the channel has no pinned messages.
+	LastPinTimestamp *time.Time `json:"last_pin_timestamp"`
 
 	// Whether the channel is marked as NSFW.
 	NSFW bool `json:"nsfw"`
@@ -465,7 +465,7 @@ type Guild struct {
 	// The time at which the current user joined the guild.
 	// This field is only present in GUILD_CREATE events and websocket
 	// update events, and thus is only present in state-cached guilds.
-	JoinedAt Timestamp `json:"joined_at"`
+	JoinedAt time.Time `json:"joined_at"`
 
 	// The hash of the guild's discovery splash.
 	DiscoverySplash string `json:"discovery_splash"`
@@ -657,6 +657,14 @@ func (g *Guild) IconURL() string {
 	return EndpointGuildIcon(g.ID, g.Icon)
 }
 
+// BannerURL returns a URL to the guild's banner.
+func (g *Guild) BannerURL() string {
+	if g.Banner == "" {
+		return ""
+	}
+	return EndpointGuildBanner(g.ID, g.Banner)
+}
+
 // A UserGuild holds a brief version of a Guild
 type UserGuild struct {
 	ID          string `json:"id"`
@@ -786,8 +794,8 @@ type Member struct {
 	// The guild ID on which the member exists.
 	GuildID string `json:"guild_id"`
 
-	// The time at which the member joined the guild, in ISO8601.
-	JoinedAt Timestamp `json:"joined_at"`
+	// The time at which the member joined the guild.
+	JoinedAt time.Time `json:"joined_at"`
 
 	// The nickname of the member, if they have one.
 	Nick string `json:"nick"`
@@ -805,13 +813,17 @@ type Member struct {
 	Roles []string `json:"roles"`
 
 	// When the user used their Nitro boost on the server
-	PremiumSince Timestamp `json:"premium_since"`
+	PremiumSince *time.Time `json:"premium_since"`
 
 	// Is true while the member hasn't accepted the membership screen.
 	Pending bool `json:"pending"`
 
 	// Total permissions of the member in the channel, including overrides, returned when in the interaction object.
 	Permissions int64 `json:"permissions,string"`
+
+	// The time at which the member's timeout will expire.
+	// Time in the past or nil if the user is not timed out.
+	CommunicationDisabledUntil *time.Time `json:"communication_disabled_until"`
 }
 
 // Mention creates a member mention
@@ -1119,8 +1131,17 @@ type MessageReaction struct {
 
 // GatewayBotResponse stores the data for the gateway/bot response
 type GatewayBotResponse struct {
-	URL    string `json:"url"`
-	Shards int    `json:"shards"`
+	URL               string             `json:"url"`
+	Shards            int                `json:"shards"`
+	SessionStartLimit SessionInformation `json:"session_start_limit"`
+}
+
+// SessionInformation provides the information for max concurrency sharding
+type SessionInformation struct {
+	Total          int `json:"total,omitempty"`
+	Remaining      int `json:"remaining,omitempty"`
+	ResetAfter     int `json:"reset_after,omitempty"`
+	MaxConcurrency int `json:"max_concurrency,omitempty"`
 }
 
 // GatewayStatusUpdate is sent by the client to indicate a presence or status update
@@ -1214,8 +1235,9 @@ const (
 	ActivityTypeGame      ActivityType = 0
 	ActivityTypeStreaming ActivityType = 1
 	ActivityTypeListening ActivityType = 2
-	//	ActivityTypeWatching // not valid in this use case?
-	ActivityTypeCustom ActivityType = 4
+	ActivityTypeWatching  ActivityType = 3
+	ActivityTypeCustom    ActivityType = 4
+	ActivityTypeCompeting ActivityType = 5
 )
 
 // Identify is sent during initial handshake with the discord gateway.
@@ -1295,6 +1317,7 @@ const (
 	PermissionViewAuditLogs       = 0x0000000000000080
 	PermissionViewChannel         = 0x0000000000000400
 	PermissionViewGuildInsights   = 0x0000000000080000
+	PermissionModerateMembers     = 0x0000010000000000
 
 	PermissionAllText = PermissionViewChannel |
 		PermissionSendMessages |
